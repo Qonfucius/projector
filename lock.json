@@ -1,0 +1,14 @@
+{
+  "https://deno.land/x/reflection@0.0.2/mod.ts": "a4b5ea68fbcb21f23a2ce35874d9880fa2d779e4b5f5ca4b0bdc7fea3bb80976",
+  "https://deno.land/x/zod@v3.18.0/ZodError.ts": "8a5272bdd5e7ac8194a3ddb5a12ab21e036275e28905d9469b16965335f4af19",
+  "https://deno.land/x/zod@v3.18.0/external.ts": "6f79b9f9cd6a8ba8dce13bce680e2875995dff3849b6ed1c184cf53ef26df954",
+  "https://deno.land/x/zod@v3.18.0/helpers/enumUtil.ts": "54efc393cc9860e687d8b81ff52e980def00fa67377ad0bf8b3104f8a5bf698c",
+  "https://deno.land/x/zod@v3.18.0/helpers/errorUtil.ts": "7a77328240be7b847af6de9189963bd9f79cab32bbc61502a9db4fe6683e2ea7",
+  "https://deno.land/x/zod@v3.18.0/helpers/parseUtil.ts": "bc678327682dbd98a989fdf7dd14905791c7bbc0e7794e13140bc308a3c47387",
+  "https://deno.land/x/zod@v3.18.0/helpers/partialUtil.ts": "8dc921a02b47384cf52217c7e539268daf619f89319b75bdf13ea178815725df",
+  "https://deno.land/x/zod@v3.18.0/helpers/typeAliases.ts": "a1a8d039eb98925f242f5ea1e21e6d3cabd7f05e9747680165c914695c979b4f",
+  "https://deno.land/x/zod@v3.18.0/helpers/util.ts": "6aebafcfdb8cade67ee0c4e72082e3a2758f1f6aa9bcce1b62e33f5e68e1982f",
+  "https://deno.land/x/zod@v3.18.0/index.ts": "035a7422d9f2be54daa0fe464254b69225b443000673e4794095d672471e8792",
+  "https://deno.land/x/zod@v3.18.0/mod.ts": "64e55237cb4410e17d968cd08975566059f27638ebb0b86048031b987ba251c4",
+  "https://deno.land/x/zod@v3.18.0/types.ts": "f15cf4d03176c0987a6b5d3589ccee35e73b7947f33f5ab93f1be27b3a51517e"
+}
