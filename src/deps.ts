@@ -9,6 +9,7 @@ export type {
   ZodTypeAny,
 } from "https://deno.land/x/zod@v3.18.0/types.ts";
 export { ZodObject } from "https://deno.land/x/zod@v3.18.0/types.ts";
+export type { Primitive } from "https://deno.land/x/zod@v3.18.0/helpers/typeAliases.ts";
 
 export type RawCreateParams =
   | {

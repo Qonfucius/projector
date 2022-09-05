@@ -1,6 +1,10 @@
 import { Model } from "./types.ts";
 import { zodSchemaSymbol } from "./validation.ts";
 import { z, ZodObject, ZodRawShape, ZodTypeAny } from "./deps.ts";
+import {
+  zodSchemaNullableSymbol,
+  zodSchemaOptionalSymbol,
+} from "./modifiers.ts";
 
 export const modelSymbol = Symbol("model");
 export const schemaSymbol = Symbol("schema");
@@ -18,7 +22,25 @@ export function ProjectionFactory<M extends Model>(model: M) {
       const metadataSchema = (Reflect.getMetadata(
         zodSchemaSymbol,
         this.constructor,
-      ) ?? {}) as ZodTypeAny | ZodRawShape;
+      ) ?? {}) as {[key: string]: ZodTypeAny};
+
+      const optionsSet = (Reflect.getMetadata(
+          zodSchemaOptionalSymbol,
+          this.constructor,
+        ) ?? new Set()) as Set<string>;
+
+      const nullableSet =  (Reflect.getMetadata(
+          zodSchemaNullableSymbol,
+          this.constructor,
+        ) ?? new Set()) as Set<string>;
+
+      for (const option of optionsSet) {
+        metadataSchema[option] = z.optional(metadataSchema[option]);
+      }
+
+      for (const nullable of nullableSet) {
+        metadataSchema[nullable] = z.nullable(metadataSchema[nullable]);
+      }
 
       const schema = (metadataSchema instanceof ZodObject)
         ? metadataSchema
