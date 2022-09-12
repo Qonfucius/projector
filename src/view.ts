@@ -9,30 +9,37 @@ import {
 export const modelSymbol = Symbol("model");
 export const schemaSymbol = Symbol("schema");
 
+type ZodProjectionObject<M extends Model> = ZodObject<{
+  [key: Omit<M, keyof Projection<M>>]: ZodTypeAny;
+}>;
+
 export interface Projection<M extends Model> {
   toModel(): M;
+  assign(o: Omit<this, keyof Projection<M>>): this;
 }
 
-export function ProjectionFactory<M extends Model>(model: M) {
-  const c = class Projection {
-    static [modelSymbol]?: M;
-    static [schemaSymbol]?: ZodObject<ZodRawShape>;
+export function ProjectionFactory<
+  M extends Model,
+>(model: M) {
+  return class Projection {
+    static [modelSymbol]: M = model;
+    static [schemaSymbol]?: ZodProjectionObject<M>;
 
-    toModel(): M {
-      const metadataSchema = (Reflect.getMetadata(
+    static buildSchema() {
+      const metadataSchema: ZodRawShape = (Reflect.getMetadata(
         zodSchemaSymbol,
-        this.constructor,
-      ) ?? {}) as {[key: string]: ZodTypeAny};
+        this,
+      ) ?? {}) as ZodRawShape;
 
       const optionsSet = (Reflect.getMetadata(
-          zodSchemaOptionalSymbol,
-          this.constructor,
-        ) ?? new Set()) as Set<string>;
+        zodSchemaOptionalSymbol,
+        this.constructor,
+      ) ?? new Set()) as Set<string>;
 
-      const nullableSet =  (Reflect.getMetadata(
-          zodSchemaNullableSymbol,
-          this.constructor,
-        ) ?? new Set()) as Set<string>;
+      const nullableSet = (Reflect.getMetadata(
+        zodSchemaNullableSymbol,
+        this.constructor,
+      ) ?? new Set()) as Set<string>;
 
       for (const option of optionsSet) {
         metadataSchema[option] = z.optional(metadataSchema[option]);
@@ -42,16 +49,22 @@ export function ProjectionFactory<M extends Model>(model: M) {
         metadataSchema[nullable] = z.nullable(metadataSchema[nullable]);
       }
 
-      const schema = (metadataSchema instanceof ZodObject)
+      this[schemaSymbol] = (metadataSchema instanceof ZodObject)
         ? metadataSchema
-        : z.object(metadataSchema as ZodRawShape);
-      const data = schema.parse(this);
+        : z.object(metadataSchema);
+    }
+
+    assign(o: Omit<this, keyof Projection>) {
+      Object.assign(this, o);
+      return this;
+    }
+
+    toModel(): M {
+      const schema = (<typeof Projection> this.constructor)[schemaSymbol]!;
 
       return new (<typeof Projection> this.constructor)[modelSymbol]!(
-        data,
+        schema.parse(this),
       ) as M;
     }
   };
-  c[modelSymbol] = model;
-  return c;
 }

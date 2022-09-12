@@ -1,4 +1,4 @@
-export type { Target } from "https://deno.land/x/reflection@0.0.2/mod.ts";
+import "https://deno.land/x/reflection@0.0.2/mod.ts";
 
 export { z } from "https://deno.land/x/zod@v3.18.0/mod.ts";
 export { errorUtil } from "https://deno.land/x/zod@v3.18.0/helpers/errorUtil.ts";

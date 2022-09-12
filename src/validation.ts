@@ -1,6 +1,6 @@
 import { Target, z } from "./deps.ts";
 import { Decorator, ZodDerivationFunction } from "./types.ts";
-import { ZodTypeAny } from "https://deno.land/x/zod@v3.18.0/types.ts";
+import { ZodRawShape } from "https://deno.land/x/zod@v3.18.0/types.ts";
 
 export const zodSchemaSymbol = Symbol("zod-projection library schema");
 
@@ -21,7 +21,7 @@ export function Validation(
     const schema = (Reflect.getMetadata(
       zodSchemaSymbol,
       target.constructor,
-    ) ?? {}) as { [key: string]: ZodTypeAny };
+    ) ?? {}) as ZodRawShape;
     let u = derivation(z);
     if (otherDerivations.length > 0) {
       u = z.union([

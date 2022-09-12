@@ -1,5 +1,5 @@
 import { Validation } from "./validation.ts";
-import { errorUtil, RawCreateParams } from "./deps.ts";
+import { RawCreateParams } from "./deps.ts";
 
 export const ValidationUndefined = (options?: RawCreateParams) =>
   Validation((s) => s.undefined(options));
