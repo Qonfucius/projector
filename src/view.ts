@@ -18,12 +18,10 @@ export interface Projection<M extends Model> {
   assign(o: Omit<this, keyof Projection<M>>): this;
 }
 
-export function ProjectionFactory<
-  M extends Model,
->(model: M) {
+export function ProjectionFactory<I>(model: Model<I> | typeof Object = Object) {
   return class Projection {
-    static [modelSymbol]: M = model;
-    static [schemaSymbol]?: ZodProjectionObject<M>;
+    static [modelSymbol]: Model<I> | typeof Object = model;
+    static [schemaSymbol]?: ZodProjectionObject<Model<I>>;
 
     static buildSchema() {
       const metadataSchema: ZodRawShape = (Reflect.getMetadata(
@@ -49,9 +47,11 @@ export function ProjectionFactory<
         metadataSchema[nullable] = z.nullable(metadataSchema[nullable]);
       }
 
-      this[schemaSymbol] = (metadataSchema instanceof ZodObject)
+      const schema = this[schemaSymbol] = (metadataSchema instanceof ZodObject)
         ? metadataSchema
         : z.object(metadataSchema);
+
+      return schema;
     }
 
     assign(o: Omit<this, keyof Projection>) {
@@ -59,12 +59,15 @@ export function ProjectionFactory<
       return this;
     }
 
-    toModel(): M {
-      const schema = (<typeof Projection> this.constructor)[schemaSymbol]!;
+    toModel(): I {
+      let schema = (<typeof Projection> this.constructor)[schemaSymbol]!;
+      if (!schema) {
+        schema = (<typeof Projection> this.constructor).buildSchema();
+      }
 
       return new (<typeof Projection> this.constructor)[modelSymbol]!(
         schema.parse(this),
-      ) as M;
+      ) as I;
     }
   };
 }

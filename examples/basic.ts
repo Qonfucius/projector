@@ -1,15 +1,37 @@
+import "https://deno.land/x/reflection@0.0.2/mod.ts";
 import * as Projector from "../mod.ts";
+
+// Example without constructor class
+
+interface Choupi {
+  surname: string;
+}
+export class ChoupiProjection extends Projector.ProjectionFactory<Choupi>() {
+  @Projector.ValidationString()
+  public readonly surname!: string;
+}
+
+const choupiRaw = {
+  surname: "surname",
+};
+
+const choupiProjection = new ChoupiProjection();
+choupiProjection.assign(choupiRaw);
+
+choupiProjection.toModel(); // Ok
+
+// Example with constructor class
 
 enum Role {
   Admin = "admin",
-  Editor = "editor"
+  Editor = "editor",
 }
 
 interface IUser {
   surname: string;
   email: string;
   password: string;
-  role: Role
+  role: Role;
 }
 
 class User implements IUser {
@@ -37,7 +59,6 @@ export class RegistrationProjection extends Projector.ProjectionFactory(User) {
   @Projector.ValidationEnum(["admin", "editor"])
   public readonly role!: string;
 }
-RegistrationProjection.buildSchema();
 
 const userRaw = {
   surname: "surname",
@@ -49,4 +70,5 @@ const userRaw = {
 const userProjection: RegistrationProjection = new RegistrationProjection();
 userProjection.assign(userRaw);
 
-userProjection.toModel();
+userProjection.toModel(); // Error
+

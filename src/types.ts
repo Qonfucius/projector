@@ -7,5 +7,5 @@ export type Decorator = <T extends Target>(
 ) => void;
 
 // deno-lint-ignore no-explicit-any
-export type Model<T = any> = new (object?: T | undefined) => T;
+export type Model<T = any> = new (object?: any) => T | typeof Object;
 export type EnumLike = { [k: string]: string | number; [nu: number]: string };
