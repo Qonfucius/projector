@@ -7,3 +7,4 @@ export * from "./src/validation_enum.ts";
 export * from "./src/validation_number.ts";
 export * from "./src/validation_other.ts";
 export * from "./src/validation_string.ts";
+export * from "./src/validation_delegation.ts";
