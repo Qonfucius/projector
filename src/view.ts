@@ -59,21 +59,20 @@ export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = 
       return this;
     }
     //deno-lint-ignore no-explicit-any
-    async map(validData: any, args?: any): Promise<I> {
-    //? 1. is validArgs useful ?
-    //? 2. Do I set an await ? or just let Promise<I> And we only await on the overload of the functin once in Steuli ?
-      return new (this.constructor as typeof Projection)[modelSymbol]!(validData) as Promise<I>;
+    async project(parsedData: any, args?: any): Promise<I> {
+      return new model(parsedData) as Promise<I>;
     }
-    async toModel(args?: A): Promise<I> {
+    
+    async apply(args?: A): Promise<I> {
       const constructor = this.constructor as typeof Projection;
-      let schema = (constructor)[schemaSymbol]!;
+      let schema = constructor[schemaSymbol]!;
       if (!schema) {
-        schema = (constructor).buildSchema();
+        schema = constructor.buildSchema();
       }
 
-      const parsedData = schema.parse(this) as Promise<I>
+      const parsedData = schema.parse(this)
       
-      return await this.map(parsedData, args)
+      return await this.project(parsedData, args)
     }
   };
 }
