@@ -18,7 +18,7 @@ export interface Projection<M extends Model> {
   assign(o: Omit<this, keyof Projection<M>>): this;
 }
 
-export function ProjectionFactory<I>(model: Model<I> | typeof Object = Object) {
+export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = Object) {
   return class Projection {
     static [modelSymbol]: Model<I> | typeof Object = model;
     static [schemaSymbol]?: ZodProjectionObject<Model<I>>;
@@ -58,16 +58,22 @@ export function ProjectionFactory<I>(model: Model<I> | typeof Object = Object) {
       Object.assign(this, o);
       return this;
     }
-
-    toModel(): I {
-      let schema = (<typeof Projection> this.constructor)[schemaSymbol]!;
+    //deno-lint-ignore no-explicit-any
+    async map(validData: any, args?: any): Promise<I> {
+    //? 1. is validArgs useful ?
+    //? 2. Do I set an await ? or just let Promise<I> And we only await on the overload of the functin once in Steuli ?
+      return new (this.constructor as typeof Projection)[modelSymbol]!(validData) as Promise<I>;
+    }
+    async toModel(args?: A): Promise<I> {
+      const constructor = this.constructor as typeof Projection;
+      let schema = (constructor)[schemaSymbol]!;
       if (!schema) {
-        schema = (<typeof Projection> this.constructor).buildSchema();
+        schema = (constructor).buildSchema();
       }
 
-      return new (<typeof Projection> this.constructor)[modelSymbol]!(
-        schema.parse(this),
-      ) as I;
+      const parsedData = schema.parse(this) as Promise<I>
+      
+      return await this.map(parsedData, args)
     }
   };
 }
