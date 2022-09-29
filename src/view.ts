@@ -19,6 +19,7 @@ export interface Projection<M extends Model> {
   assign(o: Omit<this, keyof Projection<M>>): this;
 }
 
+//deno-lint-ignore no-explicit-any
 export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = Object) {
   return class Projection {
     static [modelSymbol]: Model<I> | typeof Object = model;
@@ -48,11 +49,9 @@ export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = 
         metadataSchema[nullable] = z.nullable(metadataSchema[nullable]);
       }
 
-      const schema = this[schemaSymbol] = (metadataSchema instanceof ZodObject)
+      return this[schemaSymbol] = (metadataSchema instanceof ZodObject)
         ? metadataSchema
         : z.object(metadataSchema);
-
-      return schema;
     }
 
     assign(o: Omit<this, keyof Projection>) {
@@ -71,7 +70,7 @@ export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = 
         schema = constructor.buildSchema();
       }
 
-      const parsedData = schema.parse(this)
+      const parsedData = schema.parseAsync(this)
       
       return await this.project(parsedData, args)
     }
