@@ -14,7 +14,8 @@ type ZodProjectionObject<M extends Model> = ZodObject<{
 }>;
 
 export interface Projection<M extends Model> {
-  toModel(): M;
+  apply(): M;
+  project(): M;
   assign(o: Omit<this, keyof Projection<M>>): this;
 }
 
