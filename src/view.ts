@@ -59,10 +59,10 @@ export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = 
       return this;
     }
     //deno-lint-ignore no-explicit-any
-    async project(parsedData: any, _args?: any): Promise<I> {
-      return new model(parsedData) as Promise<I>;
+    project(parsedData: any, _args?: any): Promise<I> {
+      return Promise.resolve(new model(parsedData) as I);
     }
-    
+
     async apply(args?: A): Promise<I> {
       const constructor = this.constructor as typeof Projection;
       let schema = constructor[schemaSymbol]!;
