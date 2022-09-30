@@ -59,7 +59,7 @@ export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = 
       return this;
     }
     //deno-lint-ignore no-explicit-any
-    async project(parsedData: any, args?: any): Promise<I> {
+    async project(parsedData: any, _args?: any): Promise<I> {
       return new model(parsedData) as Promise<I>;
     }
     
@@ -70,7 +70,7 @@ export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = 
         schema = constructor.buildSchema();
       }
 
-      const parsedData = schema.parseAsync(this)
+      const parsedData = await schema.parseAsync(this)
       
       return await this.project(parsedData, args)
     }
