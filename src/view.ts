@@ -1,21 +1,18 @@
 import { Model } from "./types.ts";
 import { zodSchemaSymbol } from "./validation.ts";
-import { z, ZodObject, ZodRawShape, ZodTypeAny } from "./deps.ts";
+import { z, ZodRawShape, ZodTypeAny } from "./deps.ts";
 import {
   zodSchemaNullableSymbol,
   zodSchemaOptionalSymbol,
 } from "./modifiers.ts";
 
 export const modelSymbol = Symbol("model");
-export const schemaSymbol = Symbol("schema");
-
-type ZodProjectionObject<M extends Model> = ZodObject<{
-  [key: Omit<M, keyof Projection<M>>]: ZodTypeAny;
-}>;
+export const validatorSymbol = Symbol("schema");
 
 export interface Projection<M extends Model> {
   apply(): M;
   project(): M;
+  getValidators(): ZodRawShape;
   assign(o: Omit<this, keyof Projection<M>>): this;
 }
 
@@ -23,9 +20,9 @@ export interface Projection<M extends Model> {
 export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = Object) {
   return class Projection {
     static [modelSymbol]: Model<I> | typeof Object = model;
-    static [schemaSymbol]?: ZodProjectionObject<Model<I>>;
-
-    static buildSchema() {
+    static [validatorSymbol]?: Record<string, ZodTypeAny>;
+    
+    private static getValidators() {
       const metadataSchema: ZodRawShape = (Reflect.getMetadata(
         zodSchemaSymbol,
         this,
@@ -49,30 +46,59 @@ export function ProjectionFactory<I, A = any>(model: Model<I> | typeof Object = 
         metadataSchema[nullable] = z.nullable(metadataSchema[nullable]);
       }
 
-      return this[schemaSymbol] = (metadataSchema instanceof ZodObject)
-        ? metadataSchema
-        : z.object(metadataSchema);
+      return this[validatorSymbol] = { ...metadataSchema };
+    }
+    
+    project(_args?: A): Promise<I> {
+      return Promise.resolve(new model(this) as I);
     }
 
-    assign(o: Omit<this, keyof Projection>) {
-      Object.assign(this, o);
-      return this;
-    }
     //deno-lint-ignore no-explicit-any
-    project(parsedData: any, _args?: any): Promise<I> {
-      return Promise.resolve(new model(parsedData) as I);
-    }
+    static async apply(args?: A) {//
+      this.getValidators()
+      const instance = new model(args); //! <- new this() ?
 
-    async apply(args?: A): Promise<I> {
-      const constructor = this.constructor as typeof Projection;
-      let schema = constructor[schemaSymbol]!;
-      if (!schema) {
-        schema = constructor.buildSchema();
-      }
-
-      const parsedData = await schema.parseAsync(this)
+      //deno-lint-ignore no-explicit-any
+      let errors: any[] = [];
+      let isValid = true;
       
-      return await this.project(parsedData, args)
+      for (const [key, validator] of Object.entries(this[validatorSymbol] ?? {})) {
+        try {
+          //this[modelSymbol][key as keyof Model<I>] = await validator.parseAsync(instance[key as keyof Model<I>]);
+          Object.assign(this, await validator.parseAsync(instance[key as keyof Model<I>])); //! bad assign ?
+        } catch (e) {
+          isValid = false;
+          if (e instanceof z.ZodError) {
+            //todo add path
+            errors.push(e);
+          } else {
+            //todo new issue + path
+            // throw new BadRequestError(e.message) ?;
+          }
+        }
+      }
+      
+      if (isValid) {
+        await this.project(); //! bad interface typing ?
+        
+      }
+      
+      
     }
+
+
+
+    /* async apply(args?: A): Promise<I> {
+       const constructor = this.constructor as typeof Projection;
+       let schema = constructor[schemaSymbol]!;
+       if (!schema) {
+         schema = constructor.buildSchema();
+       }
+ 
+       const _parsedData = await schema.parseAsync(this)
+       //todo error handling ?
+       
+       return await this.project(args)
+     }*/
   };
 }
