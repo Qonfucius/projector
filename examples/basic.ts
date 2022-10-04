@@ -7,68 +7,67 @@ interface Choupi {
   surname: string;
 }
 export class ChoupiProjection extends Projector.ProjectionFactory<Choupi>() {
-  @Projector.ValidationString()
-  public readonly surname!: string;
+  @Projector.ValidationDelegation((z) => z.number())
+  public readonly age!: number;
+  @Projector.ValidationDelegation((z) => z.string().email().min(5))
+  public readonly email!: string;
 }
 
 const choupiRaw = {
-  surname: "surname",
+  age: 22,
+  email: "uoupi@gmail.com",
 };
 
-const choupiProjection = new ChoupiProjection();
-choupiProjection.assign(choupiRaw);
-
-choupiProjection.toModel(); // Ok
+console.log(await ChoupiProjection.apply(choupiRaw));
 
 // Example with constructor class
 
-enum Role {
-  Admin = "admin",
-  Editor = "editor",
-}
+// enum Role {
+//   Admin = "admin",
+//   Editor = "editor",
+// }
 
-interface IUser {
-  surname: string;
-  email: string;
-  password: string;
-  role: Role;
-}
+// interface IUser {
+//   surname: string;
+//   email: string;
+//   password: string;
+//   role: Role;
+// }
 
-class User implements IUser {
-  surname!: string;
-  email!: string;
-  password!: string;
-  role!: Role;
+// class User implements IUser {
+//   surname!: string;
+//   email!: string;
+//   password!: string;
+//   role!: Role;
 
-  constructor(o: IUser) {
-    Object.assign(this, o);
-  }
-}
+//   constructor(o: IUser) {
+//     Object.assign(this, o);
+//   }
+// }
 
-export class RegistrationProjection extends Projector.ProjectionFactory(User) {
-  @Projector.ValidationString()
-  public readonly surname!: string;
+// export class RegistrationProjection extends Projector.ProjectionFactory(User) {
+//   @Projector.ValidationString()
+//   public readonly surname!: string;
 
-  @Projector.ValidationString.email()
-  public readonly email!: string;
+//   @Projector.ValidationString.email()
+//   public readonly email!: string;
 
-  @Projector.ValidationString.min(6)
-  @Projector.ValidationString.max(20)
-  public readonly password!: string;
+//   @Projector.ValidationString.min(6)
+//   @Projector.ValidationString.max(20)
+//   public readonly password!: string;
 
-  @Projector.ValidationEnum(["admin", "editor"])
-  public readonly role!: string;
-}
+//   @Projector.ValidationEnum(["admin", "editor"])
+//   public readonly role!: string;
+// }
 
-const userRaw = {
-  surname: "surname",
-  email: "email@email.com",
-  password: "password",
-  role: "not a valid role",
-};
+// const userRaw = {
+//   surname: "surname",
+//   email: "email@email.com",
+//   password: "password",
+//   role: "not a valid role",
+// };
 
-const userProjection: RegistrationProjection = new RegistrationProjection();
-userProjection.assign(userRaw);
+// const userProjection: RegistrationProjection = new RegistrationProjection();
+// userProjection.assign(userRaw);
 
-userProjection.toModel(); // Error
-
+// userProjection.toModel(); // Error
