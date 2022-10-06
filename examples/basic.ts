@@ -7,9 +7,9 @@ interface Choupi {
   surname: string;
 }
 export class ChoupiProjection extends Projector.ProjectionFactory<Choupi>() {
-  @Projector.ValidationDelegation((z) => z.number())
+  @Projector.Validation((z) => z.number())
   public readonly age!: number;
-  @Projector.ValidationDelegation((z) => z.string().email().min(5))
+  @Projector.Validation((z) => z.string().email().min(5))
   public readonly email!: string;
 }
 
@@ -18,7 +18,7 @@ const choupiRaw = {
   email: "uoupi@gmail.com",
 };
 
-console.log(await ChoupiProjection.apply(choupiRaw));
+await ChoupiProjection.apply(choupiRaw);
 
 // Example with constructor class
 
