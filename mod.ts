@@ -1,4 +1,4 @@
-export * from "./src/view.ts";
+export * from "./src/projection.ts";
 export * from "./src/modifiers.ts";
 export * from "./src/validation.ts";
 export * from "./src/validation_date.ts";
@@ -7,3 +7,4 @@ export * from "./src/validation_enum.ts";
 export * from "./src/validation_number.ts";
 export * from "./src/validation_other.ts";
 export * from "./src/validation_string.ts";
+export * from "./src/mapper.ts";

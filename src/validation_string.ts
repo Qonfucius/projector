@@ -22,8 +22,10 @@ ValidationString.max = (max: number, message?: errorUtil.ErrMessage) =>
 ValidationString.min = (min: number, message?: errorUtil.ErrMessage) =>
   Validation((s) => s.string().min(min, message));
 
-ValidationString.exactLength = (length: number, message?: errorUtil.ErrMessage) =>
-  Validation((s) => s.string().length(length, message));
+ValidationString.exactLength = (
+  length: number,
+  message?: errorUtil.ErrMessage,
+) => Validation((s) => s.string().length(length, message));
 
 ValidationString.trim = () => Validation((s) => s.string().trim());
 
